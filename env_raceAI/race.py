@@ -114,6 +114,17 @@ class Car:
         col = mask.overlap(car_mask, offset)
         return col
 
+    def reset(self):
+        self.x, self.y = self.START_POS
+        self.angle = 90
+        self.vel = 0
+
+    """ def color_change(self):
+        if self.img == CAR_GREEN:
+            self.img = CAR_PURPLE
+        if self.img == CAR_PURPLE:
+            self.img = CAR_GREEN  """
+
 #class of the player's car
 class PlayerCar(Car):
     IMG = CAR_GREEN
@@ -156,6 +167,11 @@ def move_player(plr_car,collision=False):
             player_car.move_forward()
         if keys[pygame.K_DOWN]:
             player_car.move_backward()
+
+    if collision:    
+        if keys[pygame.K_RETURN]:
+            player_car.reset()
+            game_info.next_stage()
 
 #-----------------------------------------------------------------------------
 
