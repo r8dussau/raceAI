@@ -11,14 +11,14 @@ pygame.font.init()
 #-----------------------------------------------------------------------------
 #image loading
 
-TRACK = scale_image(pygame.image.load("env_raceAI/imgs/track_1.png"),1.7)
+TRACK = scale_image(pygame.image.load("env_raceAI/imgs/track_1.png"),1.7)#1.7
 GRASS = scale_image(pygame.image.load("env_raceAI/imgs/grass.jpg"),500*1.7/311)
 FINISH = scale_image(pygame.image.load("env_raceAI/imgs/finish.png"),0.475)
 
 BORDER = scale_image(pygame.image.load("env_raceAI/imgs/border_1.png"),1.7)
 BORDER_MASK = pygame.mask.from_surface(BORDER)  #create a mask for the collision 
 
-CAR_GREEN = scale_image(pygame.image.load("env_raceAI/imgs/car_green.png"),0.04)
+CAR_GREEN = scale_image(pygame.image.load("env_raceAI/imgs/car_green.png"),0.04)#0.04
 CAR_PURPLE = pygame.image.load("env_raceAI/imgs/car_purple.png") 
 
 #-----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ class Car:
 
     #function to call the car_rotate_center function with the arguments of the car class
     def draw(self, win):
-        car_rotate_center(win, self.img, (self.x, self.y), self.angle)
+        self.mask = car_rotate_center(win, self.img, (self.x, self.y), self.angle)
 
     #function to modify the velocity of the car to go forward
     def move_forward(self):
@@ -109,9 +109,13 @@ class Car:
 
     #function to return a no none result if a car collide with the border track
     def collision(self, mask, x=0, y=0):
-        car_mask = pygame.mask.from_surface(self.img)
-        offset = (int(self.x - x), int(self.y - y))
-        col = mask.overlap(car_mask, offset)
+        
+        rotated_img = pygame.transform.rotate(self.img, self.angle)                            
+        new_rect = rotated_img.get_rect(center=self.img.get_rect(topleft=(self.x, self.y)).center)
+
+        car_mask = pygame.mask.from_surface(rotated_img)
+        offset = (int(new_rect.x - x), int(new_rect.y - y)) 
+        col = mask.overlap(car_mask, offset) 
         return col
 
     def reset(self):
@@ -119,16 +123,10 @@ class Car:
         self.angle = 90
         self.vel = 0
 
-    """ def color_change(self):
-        if self.img == CAR_GREEN:
-            self.img = CAR_PURPLE
-        if self.img == CAR_PURPLE:
-            self.img = CAR_GREEN  """
-
 #class of the player's car
 class PlayerCar(Car):
     IMG = CAR_GREEN
-    START_POS = (300, 660) #300, 585
+    START_POS = (300, 660) 
 
 #-----------------------------------------------------------------------------
 #display and move function
@@ -175,6 +173,7 @@ def move_player(plr_car,collision=False):
 
 #-----------------------------------------------------------------------------
 
+#test = BORDER_MASK.to_surface()
 run = True
 clock = pygame.time.Clock()
 imgs = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH, (283, 649))]
@@ -187,7 +186,7 @@ while run:
     draw(WIN,imgs, player_car, game_info) 
 
     while not game_info.started:
-        text_center(WIN, MAIN_FONT, f"Press any key to start the stage {game_info.stage}!")
+        text_center(WIN, MAIN_FONT, f"Press any key to start the generation {game_info.stage}!")
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
