@@ -16,16 +16,17 @@ GRASS = scale_image(pygame.image.load("env_raceAI/imgs/grass.jpg"),500*1.7/311)
 FINISH = scale_image(pygame.image.load("env_raceAI/imgs/finish.png"),0.475)
 
 BORDER = scale_image(pygame.image.load("env_raceAI/imgs/border_1.png"),1.7)
-BORDER_MASK = pygame.mask.from_surface(BORDER)  #create a mask for the collision 
+BORDER_MASK = pygame.mask.from_surface(BORDER)  #create a mask of the border track for the collision 
 
 CAR_GREEN = scale_image(pygame.image.load("env_raceAI/imgs/car_green.png"),0.04)#0.04
 CAR_PURPLE = pygame.image.load("env_raceAI/imgs/car_purple.png") 
 
 #-----------------------------------------------------------------------------
+#display on the screen area
 
 WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Racing Game!")
+WIN = pygame.display.set_mode((WIDTH, 800)) #HEIGHT
+pygame.display.set_caption("Racing Game with Genetic Algorithm!")
 
 MAIN_FONT = pygame.font.SysFont("comicsans", 30)
 INFO_FONT = pygame.font.SysFont("comicsans", 15)
@@ -143,10 +144,10 @@ def draw(win, imgs, plr_car,gm_inf):
     win.blit(time_text, (10, 30))
 
     info_text1 = INFO_FONT.render("Press the key: UP to go forward, DOWN to go back, RIGHT to go right, LEFT to go left", 1, (255, 255, 255))
-    win.blit(info_text1, (10, HEIGHT - info_text1.get_height()-30))
+    win.blit(info_text1, (10, 800 - info_text1.get_height()-30)) #HEIGHT
 
     info_text2 = INFO_FONT.render("Select the parents of the next generation by clicking on them and then press ENTER", 1, (255, 255, 255))
-    win.blit(info_text2, (10, HEIGHT - info_text2.get_height()-10))
+    win.blit(info_text2, (10, 800 - info_text2.get_height()-10)) #HEIGHT
 
     player_car.draw(win)
     pygame.display.update()
@@ -172,6 +173,7 @@ def move_player(plr_car,collision=False):
             game_info.next_stage()
 
 #-----------------------------------------------------------------------------
+#initialization area
 
 #test = BORDER_MASK.to_surface()
 run = True
@@ -180,11 +182,16 @@ imgs = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH, (283, 649))]
 player_car = PlayerCar(1.5, 4)
 game_info = GameInfo()
 
+#-----------------------------------------------------------------------------
+#while run area
+
 while run:
     clock.tick(60)  #FPS
 
+    #display the screen with the images and the informations
     draw(WIN,imgs, player_car, game_info) 
 
+    #Display text before the begining of each generation 
     while not game_info.started:
         text_center(WIN, MAIN_FONT, f"Press any key to start the generation {game_info.stage}!")
         pygame.display.update()
