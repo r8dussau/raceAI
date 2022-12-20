@@ -89,15 +89,16 @@ class Car:
 
     #function to modify the velocity of the car to go forward
     def move_forward(self):
-        if self.vel < 0:
-            self.vel = 0
-        self.vel = min(self.vel + self.acc, self.max_vel)
+        """ if self.vel < 0:
+            self.vel = 0 """
+        #self.vel = min(self.vel + self.acc, self.max_vel)
+        self.vel = self.max_vel
         self.move()
 
     #function to modify the velocity of the car to go backward
-    def move_backward(self):
+    """ def move_backward(self):
         self.vel = -0.35
-        self.move()
+        self.move() """
 
     #function to move the car according to the angle 
     def move(self):
@@ -143,10 +144,10 @@ def draw(win, imgs, plr_car,gm_inf):
     time_text = MAIN_FONT.render(f"Time: {game_info.get_stage_time()}s", 1, (255, 255, 255))
     win.blit(time_text, (10, 30))
 
-    info_text1 = INFO_FONT.render("Press the key: UP to go forward, DOWN to go back, RIGHT to go right, LEFT to go left", 1, (255, 255, 255))
+    info_text1 = INFO_FONT.render("RIGHT to turn right, LEFT to turn left", 1, (255, 255, 255))   #Press the key: UP to go forward, DOWN to go back, RIGHT to go right, LEFT to go left
     win.blit(info_text1, (10, 800 - info_text1.get_height()-30)) #HEIGHT
 
-    info_text2 = INFO_FONT.render("Select the parents of the next generation by clicking on them and then press ENTER", 1, (255, 255, 255))
+    info_text2 = INFO_FONT.render("When all the car are crashed press ENTER", 1, (255, 255, 255)) #Select the parents of the next generation by clicking on them and then press ENTER
     win.blit(info_text2, (10, 800 - info_text2.get_height()-10)) #HEIGHT
 
     player_car.draw(win)
@@ -162,10 +163,11 @@ def move_player(plr_car,collision=False):
             player_car.rotate(left=True)
         if keys[pygame.K_RIGHT]:
             player_car.rotate(right=True)
-        if keys[pygame.K_UP]:
-            player_car.move_forward()
-        if keys[pygame.K_DOWN]:
-            player_car.move_backward()
+        #if keys[pygame.K_UP]:
+            #player_car.move_forward()
+        player_car.move_forward()
+        """ if keys[pygame.K_DOWN]:
+            player_car.move_backward() """
 
     if collision:    
         if keys[pygame.K_RETURN]:
