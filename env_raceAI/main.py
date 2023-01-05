@@ -92,7 +92,10 @@ class Car:
         self.acc = 0.05
 
         self.mask = pygame.mask.from_surface(self.img)
-        self.rect = (0, 0)
+        self.rect = self.img.get_rect(center=self.img.get_rect(topleft=(self.x, self.y)).center)
+
+        self.collide = False
+        self.alive = False
 
         self.width = 320
         self.height = 651
@@ -131,6 +134,8 @@ class Car:
         elif right:
             self.angle -= self.rot_vel
 
+        
+        #print(self.rect.x, self.rect.y)
         self.numbFromTurn += 1
 
     #function to call the car_rotate_center function with the arguments of the car class + refresh self.rect and self.mask (for the collision)
@@ -207,7 +212,6 @@ class Car:
     #function to return a no none result if a car collide with the border track
     def collision(self, mask, x=0, y=0):
         offset = (int(self.rect.x - x), int(self.rect.y - y)) 
-        #offset = (int(self.rect[0] - x), int(self.rect[1] - y)) 
         col = mask.overlap(self.mask, offset) 
         return col
 
@@ -222,6 +226,7 @@ class Car:
         self.vel = 0
         self.numbFromTurn = 0
         self.distFromGoal = 0
+        self.alive = False
 
 
 #class of the player's car
@@ -234,14 +239,14 @@ class PlayerCar(Car):
 #display and move function
 
 #function to display images and texts
-def draw(win, imgs, plr_car,gm_inf):
+def draw(win, imgs, pl_car, gm_inf):
     for img, pos in imgs:
         win.blit(img, pos)
 
-    stage_text = MAIN_FONT.render(f"Generation: {game_info.stage}", 1, (255, 255, 255))
+    stage_text = MAIN_FONT.render(f"Generation: {gm_inf.stage}", 1, (255, 255, 255))
     win.blit(stage_text, (10, 0))
 
-    time_text = MAIN_FONT.render(f"Time: {game_info.get_stage_time()}s", 1, (255, 255, 255))
+    time_text = MAIN_FONT.render(f"Time: {gm_inf.get_stage_time()}s", 1, (255, 255, 255))
     win.blit(time_text, (10, 30))
 
     info_text1 = INFO_FONT.render("RIGHT to turn right, LEFT to turn left", 1, (255, 255, 255))   #Press the key: UP to go forward, DOWN to go back, RIGHT to go right, LEFT to go left
@@ -252,29 +257,30 @@ def draw(win, imgs, plr_car,gm_inf):
 
     
 
-    player_car.draw(win)
+    pl_car.draw(win)
     pygame.display.update()
 
 #function to move the car's image
-def move_player(plr_car,keys,collision=False):
+#def move_player(plr_car,keys,collision=False):
+def move_player(plr_car,keys):
 
     #action in function of wich key was pressed
-    if not collision:
+    if not plr_car.collide:
         if keys[pygame.K_LEFT]:
-            player_car.rotate(left=True)
+            plr_car.rotate(left=True)
         if keys[pygame.K_RIGHT]:
-            player_car.rotate(right=True)
+            plr_car.rotate(right=True)
         #if keys[pygame.K_UP]:
             #player_car.move_forward()
-        player_car.move_forward()
-        player_car.update()
+        plr_car.move_forward()
+        plr_car.update()
         """ if keys[pygame.K_DOWN]:
             player_car.move_backward() """
 
-    if collision:    
+    """ if plr_car.collide:    
         if keys[pygame.K_RETURN]:
-            player_car.reset()
-            game_info.next_stage()
+            plr_car.reset()
+            game_info.next_stage() """
         
 
                 
@@ -294,13 +300,16 @@ game_info = GameInfo()
 selected = 0
 selectedCar = []
 
-""" aiCars = []
-numbOfCar = 1 
+aiCars = []
+numbOfCar = 2
 aliveCar = numbOfCar
-collidedCar = []
+
 
 for i in range(numbOfCar):
-    aiCars.append(PlayerCar(1.5,4)) """
+    aiCars.append(PlayerCar(1.5+i,4)) 
+
+
+#####print(aiCars[0], player_car)
 
 #-----------------------------------------------------------------------------
 #while run area
@@ -309,7 +318,9 @@ while run:
     clock.tick(60)  #FPS
 
     #display the screen with the images and the informations
-    draw(WIN,imgs, player_car, game_info) 
+    for aicar in aiCars:
+        draw(WIN, imgs, aicar, game_info)  
+    draw(WIN, imgs, player_car, game_info)
 
     #Display text before the begining of each generation 
     while not game_info.started:
@@ -328,37 +339,46 @@ while run:
             run = False
             break
 
-    """ for aicar in aiCars:
-        
-        if aicar.collision(BORDER_MASK) == None:
-            colli = False
-            move_player(aicar,keys,colli)
-        else:
-            colli = True
-            move_player(aicar,keys,colli)
-        
-        if keys[pygame.K_a]:
-            aicar.showLines() """
+    keys = pygame.key.get_pressed() #get the key of the keyboard pressed
     
     #stop the car if there is a collision between the track border and the car
-    
-    keys = pygame.key.get_pressed() #get the key of the keyboard pressed
+    for aicar in aiCars:
+        if aicar.collision(BORDER_MASK) == None:
+            aicar.collide = False
+            move_player(aicar,keys)
+        else:
+            aicar.collide = True
+            #move_player(aicar,keys)
+            if aicar.alive == False:
+                aliveCar -=1
+                aicar.alive = True
+
+    if aliveCar == 0:
+        if keys[pygame.K_RETURN]:
+            for aicar in aiCars:
+                aicar.reset()
+            game_info.next_stage()
+            aliveCar = numbOfCar
+
+
     if player_car.collision(BORDER_MASK) == None:
-        colli = False
-        move_player(player_car,keys,colli)
+        player_car.collide = False
+        move_player(player_car,keys)
     else:
-        colli = True
-        move_player(player_car,keys,colli)
+        player_car.collide = True
+        move_player(player_car,keys)
     
     if keys[pygame.K_a]:
-        player_car.showLines()
+        player_car.showLines() 
         
+
+
     mouses = pygame.mouse.get_pressed()
     if mouses[0]:   
             pos = pygame.mouse.get_pos()
             point = Point(pos[0], pos[1])            
 
-            """ for aicar in aiCars:
+            for aicar in aiCars:
 
                 polygon = Polygon([aicar.bottomLeft, aicar.topLeft, aicar.topRight, aicar.bottomRight, aicar.bottomLeft])
 
@@ -367,16 +387,15 @@ while run:
                         aicar.img = CAR_PURPLE
                     elif aicar.img == CAR_PURPLE:
                         aicar.img = CAR_GREEN
-                    aicar.update() """
-
-
-            polygon = Polygon([player_car.bottomLeft, player_car.topLeft, player_car.topRight, player_car.bottomRight, player_car.bottomLeft])
+                    aicar.update()
+                    
+            """ polygon = Polygon([player_car.bottomLeft, player_car.topLeft, player_car.topRight, player_car.bottomRight, player_car.bottomLeft])
 
             if (polygon.contains(point)):
                 if player_car.img == CAR_GREEN:
                     player_car.img = CAR_PURPLE
                 elif player_car.img == CAR_PURPLE:
                     player_car.img = CAR_GREEN
-                player_car.update()
+                player_car.update() """
 
 pygame.quit() 
