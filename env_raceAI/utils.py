@@ -15,8 +15,7 @@ def car_rotate_center(win, img, top_left, angle):
 
     """ pygame.draw.rect(win, (255, 0, 0), new_rect, 2)   #draw rectangle of the image
     car_mask = pygame.mask.from_surface(img).to_surface()
-    pygame.draw.rect(win, (0, 255, 0), car_mask.get_rect(center=img.get_rect(topleft=top_left).center), 2)  #draw the rectangle if mask isn't rotated when checking collision """                                      
-
+    pygame.draw.rect(win, (0, 255, 0), car_mask.get_rect(center=img.get_rect(topleft=top_left).center), 2)  #draw the rectangle if mask isn't rotated when checking collision """                      
     return new_rect, pygame.mask.from_surface(rotated_img)
 
 #function to print the text in the middle of the window
@@ -40,7 +39,7 @@ def movePoint(point,angle,velo):
 def distance(center, end):
         return math.sqrt((end[0]-center[0])**2 + (end[1]-center[1])**2)
 
-""" def rotation(origin, point, angle): #Used to rotate points #rotate(origin, point, math.radians(10))
+def rotation(origin, point, angle): #Used to rotate points #rotate(origin, point, math.radians(10))
     ox, oy = origin
     px, py = point
     angle = -angle
@@ -48,4 +47,4 @@ def distance(center, end):
     qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
     qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
    
-    return qx, qy  """
+    return qx, qy 
