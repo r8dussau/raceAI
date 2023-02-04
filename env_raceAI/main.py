@@ -240,6 +240,25 @@ class PlayerCar(Car):
 
 #function to display images and texts
 def draw(win, imgs, pl_car, gm_inf):
+    # for img, pos in imgs:
+    #     win.blit(img, pos)
+
+    # stage_text = MAIN_FONT.render(f"Generation: {gm_inf.stage}", 1, (255, 255, 255))
+    # win.blit(stage_text, (10, 0))
+
+    # time_text = MAIN_FONT.render(f"Time: {gm_inf.get_stage_time()}s", 1, (255, 255, 255))
+    # win.blit(time_text, (10, 30))
+
+    # info_text1 = INFO_FONT.render("RIGHT to turn right, LEFT to turn left", 1, (255, 255, 255))   #Press the key: UP to go forward, DOWN to go back, RIGHT to go right, LEFT to go left
+    # win.blit(info_text1, (10, 780 - info_text1.get_height()-30)) #HEIGHT
+
+    # info_text2 = INFO_FONT.render("When all the car are crashed press ENTER", 1, (255, 255, 255)) #Select the parents of the next generation by clicking on them and then press ENTER
+    # win.blit(info_text2, (10, 780 - info_text2.get_height()-10)) #HEIGHT
+
+    pl_car.draw(win)
+    pygame.display.update()
+
+def drawBack(win,imgs, gm_inf):
     for img, pos in imgs:
         win.blit(img, pos)
 
@@ -254,10 +273,6 @@ def draw(win, imgs, pl_car, gm_inf):
 
     info_text2 = INFO_FONT.render("When all the car are crashed press ENTER", 1, (255, 255, 255)) #Select the parents of the next generation by clicking on them and then press ENTER
     win.blit(info_text2, (10, 780 - info_text2.get_height()-10)) #HEIGHT
-
-    
-
-    pl_car.draw(win)
     pygame.display.update()
 
 #function to move the car's image
@@ -301,12 +316,12 @@ selected = 0
 selectedCar = []
 
 aiCars = []
-numbOfCar = 2
+numbOfCar = 15
 aliveCar = numbOfCar
 
 
 for i in range(numbOfCar):
-    aiCars.append(PlayerCar(1.5+i,4)) 
+    aiCars.append(PlayerCar(1.5+0.1*i,4)) 
 
 
 #####print(aiCars[0], player_car)
@@ -317,10 +332,12 @@ for i in range(numbOfCar):
 while run:
     clock.tick(60)  #FPS
 
+    drawBack(WIN,imgs,game_info)
+
     #display the screen with the images and the informations
     for aicar in aiCars:
         draw(WIN, imgs, aicar, game_info)  
-    draw(WIN, imgs, player_car, game_info)
+    #draw(WIN, imgs, player_car, game_info)
 
     #Display text before the begining of each generation 
     while not game_info.started:
@@ -339,7 +356,11 @@ while run:
             run = False
             break
 
+    
+
     keys = pygame.key.get_pressed() #get the key of the keyboard pressed
+    for aicar in aiCars:
+        move_player(aicar,keys)
     
     #stop the car if there is a collision between the track border and the car
     for aicar in aiCars:
@@ -389,13 +410,14 @@ while run:
                         aicar.img = CAR_GREEN
                     aicar.update()
                     
-            """ polygon = Polygon([player_car.bottomLeft, player_car.topLeft, player_car.topRight, player_car.bottomRight, player_car.bottomLeft])
+            # polygon = Polygon([player_car.bottomLeft, player_car.topLeft, player_car.topRight, player_car.bottomRight, player_car.bottomLeft])
 
-            if (polygon.contains(point)):
-                if player_car.img == CAR_GREEN:
-                    player_car.img = CAR_PURPLE
-                elif player_car.img == CAR_PURPLE:
-                    player_car.img = CAR_GREEN
-                player_car.update() """
+            # if (polygon.contains(point)):
+            #     if player_car.img == CAR_GREEN:
+            #         player_car.img = CAR_PURPLE
+            #     elif player_car.img == CAR_PURPLE:
+            #         player_car.img = CAR_GREEN
+            #     player_car.update()
+    #pygame.display.update()
 
 pygame.quit() 
