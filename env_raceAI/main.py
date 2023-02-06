@@ -94,7 +94,7 @@ class Car:
         self.rot_vel = rot_vel
         self.angle = 90
         self.x, self.y = self.START_POS
-        self.acc = 0.05
+        self.acc = 0.1
 
         self.mask = pygame.mask.from_surface(self.img)
         self.rect = self.img.get_rect(center=self.img.get_rect(topleft=(self.x, self.y)).center)
@@ -134,6 +134,7 @@ class Car:
         self.fitnessValue = 0
         self.parentOne = False
         self.parentTwo = False
+        self.iteration = 0
 
         self.input = np.array([[self.distLeft], [self.distRight], [self.distAhead]])
         self.output = np.array([[0], [0]])
@@ -240,6 +241,7 @@ class Car:
         self.distTraveled = 0
         self.alive = False
         self.fitnessValue = 0
+        self.iteration = 0
 
 
 #class of the player's car
@@ -301,18 +303,26 @@ def move_player(plr_car,keys):
     pygame.display.update()
 
 def move_ai(aicar):
-    decision = randint(0,2)
-    aicar.decisionList.append(decision)
+    if len(aicar.decisionList) == 0:
+        decision = randint(0,2)
+        aicar.decisionList.append(decision)
+    elif (len(aicar.decisionList) != 0) and (aicar.iteration != len(aicar.decisionList)-1):
+        decision=aicar.decisionList[aicar.iteration]
+        aicar.iteration += 1
+    else:   
+        decision = randint(0,2)
+        aicar.decisionList.append(decision)
+
     if not aicar.collide:
+        aicar.move_forward()
         if decision==0:
             aicar.rotate(left=True)
         elif decision==1:
             aicar.rotate(right=True)
         else:
             pass
-        aicar.move_forward()
-        #aicar.update()
-    pygame.display.update()
+
+    #pygame.display.update()
         
 #-----------------------------------------------------------------------------
 #genetic algorithm
@@ -320,13 +330,39 @@ def move_ai(aicar):
 def fitness(aicar):
     aicar.fitnessValue = 2000 - aicar.distTraveled + aicar.numbOfTurn/2
 
-def crossover(aicar):
-    if aicar.parentOne==True:
-        parentOne = aicar.decisionList
-    elif aicar.parentTwo==True:
-        parentTwo = aicar.decisionList
-    else:
-        aicar.decisionList = list()
+
+def crossover(aiCars):#aicar
+    for aicar in aiCars:
+        if aicar.parentOne==True:
+            father=list()
+            father = aicar.decisionList[:len(aicar.decisionList)-3]
+            aicar.decisionList = father
+
+        elif aicar.parentTwo==True:
+            mother=list()
+            mother = aicar.decisionList[:len(aicar.decisionList)-3]
+            aicar.decisionList = mother
+
+    for aicar in aiCars:
+        if (aicar.parentOne==False) and (aicar.parentTwo==False):
+            aicar.decisionList = list()
+            for i in range(len(father)):
+                random = randint(1,2)
+                if random == 1:
+                    aicar.decisionList.append(father[i])
+                elif (random == 2) and (i<len(mother)):
+                    aicar.decisionList.append(mother[i])
+                else:
+                    aicar.decisionList.append(father[i])
+    
+
+def mutation(aiCars):
+    for aicar in aiCars:
+        for i in range(len(aicar.decisionList)):
+                random = randint(1,250) #0.5%
+                if random==1:
+                    aicar.decisionList[i]=randint(0,2)
+    
 
 #-----------------------------------------------------------------------------
 #initialization area
@@ -343,12 +379,12 @@ selected = 0
 selectedCar = []
 
 aiCars = []
-numbOfCar = 15
+numbOfCar = 30
 aliveCar = numbOfCar
 
 
 for i in range(numbOfCar):
-    aiCars.append(PlayerCar(1.5,4)) 
+    aiCars.append(PlayerCar(2.5,4)) #1.5
 
 
 #-----------------------------------------------------------------------------
@@ -416,12 +452,16 @@ while run:
                 aicar.img = CAR_GREEN
                 aicar.parentOne = False
                 aicar.parentTwo = False
+        
 
         if keys[pygame.K_RETURN]:
+            crossover(aiCars)
+            mutation(aiCars)
             for aicar in aiCars:
                 aicar.reset()
             game_info.next_stage()
             aliveCar = numbOfCar
+
 
 
     #control of the player's car
@@ -433,6 +473,7 @@ while run:
         move_player(player_car,keys)
         fitness(player_car)
     
+        
     if keys[pygame.K_a]:
         player_car.showLines() """ 
         
