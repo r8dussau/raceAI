@@ -262,7 +262,7 @@ def draw_background(win,imgs, gm_inf):
 
     stage_text = MAIN_FONT.render(f"Generation: {gm_inf.stage}", 1, (255, 255, 255))
     win.blit(stage_text, (10, 0))
-    alive_car = MAIN_FONT.render(f"Car still alive: {aliveCar}", 1, (255, 255, 255))
+    alive_car = MAIN_FONT.render(f"Car still alive: {aliveCar} on {numbOfCar}", 1, (255, 255, 255))
     win.blit(alive_car, (10, 30))
 
     time_text = MAIN_FONT.render(f"Time: {gm_inf.get_stage_time()}s", 1, (255, 255, 255))
