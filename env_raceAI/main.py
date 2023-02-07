@@ -5,8 +5,6 @@ import pygame
 import time
 import math
 import numpy as np
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
 from utils import scale_image, car_rotate_center, text_center, distance, movePoint, rotation
 from random import randint
 
@@ -106,39 +104,37 @@ class Car:
         self.height = 651
         self.center = (0, 0)
 
-        self.distTraveled = 0
-        self.numbOfTurn = 0
-
-        #Show lines of the car if it's True
+        #Show lines of the player_car if it's True
         self.showlines = False
 
-        #Coordinates of the contact point between the line and the wall
+        #Coordinates of the contact point between the line and the wall for the player_car
         self.left = (0, 0)
         self.right = (0, 0)
         self.ahead = (0, 0)
 
-        #distance between the center of the car and the coordinates of the top
+        #distance between the center of the car and the coordinates of the top for the player_car
         self.distLeft = 0
         self.distRight = 0
         self.distAhead = 0
 
-        #Coordinates of the 
+        #Coordinates of the corner of the player_car
         self.topLeft = (0, 0)
         self.topRight = (0, 0)
         self.bottomLeft = (0, 0)
         self.bottomRight = (0, 0)
 
+        #value to calculate the fitnessValue
+        self.distTraveled = 0
+        self.numbOfTurn = 0
+        self.fitnessValue = 0
+
         #save the random decision into a list 
         self.decisionList = list()
         self.decisionListSave = list()
-        self.fitnessValue = 0
         self.parentOne = False
         self.parentTwo = False
         self.iteration = 0
-
-        self.input = np.array([[self.distLeft], [self.distRight], [self.distAhead]])
-        self.output = np.array([[0], [0]])
-        
+     
 
     #function to rotate the car 
     def rotate(self, left=False, right=False):
@@ -147,11 +143,9 @@ class Car:
         elif right:
             self.angle -= self.rot_vel
 
-        
-        #print(self.rect.x, self.rect.y)
         self.numbOfTurn += 1
 
-    #function to call the car_rotate_center function with the arguments of the car class + refresh self.rect and self.mask (for the collision)
+    #function to call the car_rotate_center function with the arguments of the car class + refresh self.rect and self.mask (for the collision) + display line of the player_car
     def draw(self, win):
         self.rect, self.mask = car_rotate_center(win, self.img, (self.x, self.y), self.angle)   
 
@@ -170,6 +164,7 @@ class Car:
         
         self.distTraveled += 1
 
+    #for the player_car
     def update(self):
         self.center = (self.x + 0.5*round(self.width*0.04), self.y + 0.5*round(self.height*0.04)) #modified the center of the car when rotation
 
@@ -207,11 +202,6 @@ class Car:
         self.distAhead = int(distance(self.center, self.ahead)) 
         self.distLeft = int(distance(self.center, self.left))
         self.distRight = int(distance(self.center, self.right)) 
-
-    #function to modify the velocity of the car to go backward
-    """ def move_backward(self):
-        self.vel = -0.35
-        self.move() """
 
     #function to move the car according to the angle 
     def move(self):
@@ -264,6 +254,7 @@ def draw_background(win,imgs, gm_inf):
 
     stage_text = MAIN_FONT.render(f"Generation: {gm_inf.stage}", 1, (255, 255, 255))
     win.blit(stage_text, (10, 0))
+
     alive_car = MAIN_FONT.render(f"Car still alive: {aliveCar} on {numbOfCar}", 1, (255, 255, 255))
     win.blit(alive_car, (10, 30))
 
@@ -293,13 +284,6 @@ def move_player(plr_car,keys):
             #player_car.move_forward()
         plr_car.move_forward()
         plr_car.update()
-        """ if keys[pygame.K_DOWN]:
-            player_car.move_backward() """
-
-    """ if plr_car.collide:    
-        if keys[pygame.K_RETURN]:
-            plr_car.reset()
-            game_info.next_stage() """
     pygame.display.update()
 
 def move_ai(aicar):
@@ -325,21 +309,22 @@ def move_ai(aicar):
     #pygame.display.update()
         
 #-----------------------------------------------------------------------------
-#genetic algorithm
+#Genetic Algorithm function
 
+#get the fitness value of each car controlled by the AI
 def fitness(aicar):
     aicar.fitnessValue = 2000 - aicar.distTraveled + aicar.numbOfTurn/2
 
-
+#create the list of the father and the mother according to the car which is parentOne or parentTwo
+#According to these two parents list, create for each children a list who each cell has the same probability to have the cell of the mother or the father
 def crossover(aiCars):#aicar
+    father, mother = list(), list()
     for aicar in aiCars:
         if aicar.parentOne==True:
-            father=list()
             father = aicar.decisionList[:len(aicar.decisionList)-3]
             aicar.decisionList = father
 
         elif aicar.parentTwo==True:
-            mother=list()
             mother = aicar.decisionList[:len(aicar.decisionList)-3]
             aicar.decisionList = mother
 
@@ -355,7 +340,7 @@ def crossover(aiCars):#aicar
                 else:
                     aicar.decisionList.append(father[i])
     
-
+#each cell of each list has 0.4% to see his cell randomly changed
 def mutation(aiCars):
     for aicar in aiCars:
         for i in range(len(aicar.decisionList)):
@@ -367,7 +352,6 @@ def mutation(aiCars):
 #-----------------------------------------------------------------------------
 #initialization area
 
-#test = BORDER_MASK.to_surface()
 run = True
 clock = pygame.time.Clock()
 imgs = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH, (283, 649))]
@@ -375,8 +359,9 @@ player_car = PlayerCar(1.5, 4) #1.5
 game_info = GameInfo()
 
 
-selected = 0
-selectedCar = []
+""" selected = 0
+selectedCar = [] """
+
 
 aiCars = []
 numbOfCar = 30
@@ -393,9 +378,10 @@ for i in range(numbOfCar):
 while run:
     clock.tick(60)  #FPS
 
+    #display the screen with the images and the informations
     draw_background(WIN,imgs,game_info)
 
-    #display the screen with the images and the informations
+    #display all the car controlled by the ai
     for aicar in aiCars:
         draw_car(WIN, aicar)  
     #draw_car(WIN, player_car)
@@ -418,8 +404,8 @@ while run:
             break
 
     
-
-    keys = pygame.key.get_pressed() #get the key of the keyboard pressed
+    #get the key of the keyboard pressed
+    keys = pygame.key.get_pressed() 
     
     #stop the car if there is a collision between the track border and the car
     for aicar in aiCars:
@@ -431,15 +417,16 @@ while run:
             if aicar.alive == False:
                 aliveCar -=1
                 aicar.alive = True
-                fitness(aicar)
-                #print(aicar.decisionList)
+
+                fitness(aicar) 
 
     if aliveCar == 0:
-        fitnessList=list()
+        fitnessList=list() #create a list to sort the fitness value, the two fitness values with the smallest value are choosen to be the two parents of the next generation
         for aicar in aiCars:
             fitnessList.append(aicar.fitnessValue)
         fitnessList.sort()
         for aicar in aiCars:
+            #change the color of the car and turn on the bool of of the parents
             if aicar.fitnessValue == fitnessList[0]:
                 aicar.img = CAR_PURPLE
                 aicar.parentOne = True
@@ -452,11 +439,12 @@ while run:
                 aicar.img = CAR_GREEN
                 aicar.parentOne = False
                 aicar.parentTwo = False
-        
 
         if keys[pygame.K_RETURN]:
-            crossover(aiCars)
+
+            crossover(aiCars)  
             mutation(aiCars)
+
             for aicar in aiCars:
                 aicar.reset()
             game_info.next_stage()
@@ -476,33 +464,5 @@ while run:
         
     if keys[pygame.K_a]:
         player_car.showLines() """ 
-        
-
-    #color change when the car was pressed by the mouse
-    # mouses = pygame.mouse.get_pressed()
-    # if mouses[0]:   
-    #         pos = pygame.mouse.get_pos()
-    #         point = Point(pos[0], pos[1])            
-
-    #         for aicar in aiCars:
-
-    #             polygon = Polygon([aicar.bottomLeft, aicar.topLeft, aicar.topRight, aicar.bottomRight, aicar.bottomLeft])
-
-    #             if (polygon.contains(point)):
-    #                 if aicar.img == CAR_GREEN:
-    #                     aicar.img = CAR_PURPLE
-    #                 elif aicar.img == CAR_PURPLE:
-    #                     aicar.img = CAR_GREEN
-    #                 aicar.update()
-                    
-            # polygon = Polygon([player_car.bottomLeft, player_car.topLeft, player_car.topRight, player_car.bottomRight, player_car.bottomLeft])
-
-            # if (polygon.contains(point)):
-            #     if player_car.img == CAR_GREEN:
-            #         player_car.img = CAR_PURPLE
-            #     elif player_car.img == CAR_PURPLE:
-            #         player_car.img = CAR_GREEN
-            #     player_car.update()
-    #pygame.display.update()
 
 pygame.quit() 
