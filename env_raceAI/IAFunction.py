@@ -7,7 +7,7 @@ import pygame
 def draw_car(win, aiCars):
     for aicar in aiCars:
         aicar.draw(win)
-        pygame.display.update()
+        #pygame.display.update()
 
 #function to move the aiCar randomly or create a childrenList according to the decisionList of the two parents
 def move_ai(aicar):
@@ -44,11 +44,11 @@ def crossover(aiCars):#aicar
     father, mother = list(), list()
     for aicar in aiCars:
         if aicar.parentOne==True:
-            father = aicar.decisionList[:len(aicar.decisionList)-3]
+            father = aicar.decisionList[:len(aicar.decisionList)-5]
             aicar.decisionList = father
 
         elif aicar.parentTwo==True:
-            mother = aicar.decisionList[:len(aicar.decisionList)-3]
+            mother = aicar.decisionList[:len(aicar.decisionList)-5]
             aicar.decisionList = mother
 
     for aicar in aiCars:

@@ -238,12 +238,9 @@ def draw_background(win,imgs, gm_inf):
 
     if aliveCar==0:
         text_center(WIN, MAIN_FONT, f"Press enter to pass to the generation {game_info.stage+1}!")
-        pygame.display.update()
 
     info_text1 = INFO_FONT.render("If the player_car is activated, press RIGHT to turn right and press LEFT to turn left", 1, (255, 255, 255))   #Press the key: UP to go forward, DOWN to go back, RIGHT to go right, LEFT to go left
     win.blit(info_text1, (10, 780 - info_text1.get_height()-10)) #HEIGHT
-
-    pygame.display.update()
 
 #function to move the player_car's image
 def move_player(plr_car,keys):
@@ -256,11 +253,9 @@ def move_player(plr_car,keys):
             plr_car.rotate(right=True)
         plr_car.move_forward()
         plr_car.update()
-    pygame.display.update()
 
 def draw_player(win, plr_car):
     plr_car.draw(win)
-    pygame.display.update()
 
 #-----------------------------------------------------------------------------
 #initialization area
@@ -281,15 +276,15 @@ COLOR_LINE = (255, 0, 0)
 run = True
 clock = pygame.time.Clock()
 imgs = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH, (283, 649))]
-player_car = PlayerCar(1.5, 4) #1.5
+player_car = PlayerCar(1.5, 4)
 game_info = GameInfo()
 
 aiCars = []
-numbOfCar = 30
+numbOfCar = 100
 aliveCar = numbOfCar
 
 for i in range(numbOfCar):
-    aiCars.append(PlayerCar(2.5,4))
+    aiCars.append(PlayerCar(1.5,4))
 
 
 #-----------------------------------------------------------------------------
@@ -381,15 +376,16 @@ while run:
                 aicar.parentOne = False
                 aicar.parentTwo = False
 
-        if keys[pygame.K_RETURN]:
+        #if keys[pygame.K_RETURN]:
 
-            crossover(aiCars)  
-            mutation(aiCars)
+        crossover(aiCars)  
+        mutation(aiCars)
 
-            for aicar in aiCars:
-                aicar.reset()
-            game_info.next_stage()
-            aliveCar = numbOfCar
+        for aicar in aiCars:
+            aicar.reset()
+        game_info.next_stage()
+        aliveCar = numbOfCar
+        game_info.start_stage()
 
-
+    pygame.display.update()
 pygame.quit() 
