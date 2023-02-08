@@ -4,9 +4,8 @@
 import pygame
 import time
 import math
-import numpy as np
-from utils import scale_image, car_rotate_center, text_center, distance, movePoint, rotation
 from random import randint
+from utils import scale_image, car_rotate_center, text_center, distance, movePoint, rotation
 
 pygame.font.init()
 
@@ -270,8 +269,7 @@ def draw_background(win,imgs, gm_inf):
 
     pygame.display.update()
 
-#function to move the car's image
-#def move_player(plr_car,keys,collision=False):
+#function to move the player_car's image
 def move_player(plr_car,keys):
 
     #action in function of wich key was pressed
@@ -286,6 +284,7 @@ def move_player(plr_car,keys):
         plr_car.update()
     pygame.display.update()
 
+#function to move the aiCar randomly or according to the decisionList, built by the parents
 def move_ai(aicar):
     if len(aicar.decisionList) == 0:
         decision = randint(0,2)
@@ -358,15 +357,9 @@ imgs = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH, (283, 649))]
 player_car = PlayerCar(1.5, 4) #1.5
 game_info = GameInfo()
 
-
-""" selected = 0
-selectedCar = [] """
-
-
 aiCars = []
 numbOfCar = 30
 aliveCar = numbOfCar
-
 
 for i in range(numbOfCar):
     aiCars.append(PlayerCar(2.5,4)) #1.5
@@ -421,12 +414,12 @@ while run:
                 fitness(aicar) 
 
     if aliveCar == 0:
-        fitnessList=list() #create a list to sort the fitness value, the two fitness values with the smallest value are choosen to be the two parents of the next generation
+        fitnessList=list() 
         for aicar in aiCars:
             fitnessList.append(aicar.fitnessValue)
         fitnessList.sort()
         for aicar in aiCars:
-            #change the color of the car and turn on the bool of of the parents
+            #change the color of the car and turn on the bool of the parents
             if aicar.fitnessValue == fitnessList[0]:
                 aicar.img = CAR_PURPLE
                 aicar.parentOne = True

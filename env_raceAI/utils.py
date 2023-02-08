@@ -1,6 +1,5 @@
 import pygame 
 import math
-import numpy as np
 
 #function to reajust the size of the images
 def scale_image(img,factor):
