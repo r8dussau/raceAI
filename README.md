@@ -1,15 +1,12 @@
 # RaceAI
 RaceAI project from Neural Networks and Intelligent Systems Semester 9 course in Electronical and Computer Engineering School, NTUA.  
-Python files are available on this git. 
+All the usefull files are available on this git.
 
 ### Components
-All components can be found in env_intelliq folder:  
-- *templates* folder contains all HTML simple templates we created fo every endpoints.  
-- *uploaded_files* is the folder where uploaded questionnaires are localy stored.  
-- *intelliq_api.py* contains all our python endpoints functions.  
-- *QQ000.json* is a questionnaire file who can be used to test the questionnaire upload endpoint.  
-- *setup_database.txt* containes all the code you should put in your database QUERY to setup our database model. 
-- *main.py* contain all 
+All components can be found in env_raceAI folder:  
+- *main.py* contains all our python code to run the game with the Artificial Intelligent.
+- *utils.py* contains some functions used in the main file. 
+- *imgs* folder contains all the images who are used in this project.
 
 ### Author
 - Raphaël Dussauze
