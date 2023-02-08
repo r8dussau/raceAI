@@ -15,8 +15,9 @@ pygame.font.init()
 
 TRACK = scale_image(pygame.image.load("env_raceAI/imgs/track.png"),1.7)#1.7
 GRASS = scale_image(pygame.image.load("env_raceAI/imgs/grass.jpg"),500*1.7/311)
-FINISH = scale_image(pygame.image.load("env_raceAI/imgs/finish.png"),0.475)
 
+FINISH = scale_image(pygame.image.load("env_raceAI/imgs/finish.png"),0.475)
+FINISH_MASK =  pygame.mask.from_surface(FINISH)
 
 BORDER = scale_image(pygame.image.load("env_raceAI/imgs/border.png"),1.7)
 BORDER_MASK = pygame.mask.from_surface(BORDER)  #create a mask of the border track for the collision 
@@ -121,6 +122,8 @@ class Car:
         self.parentOne = False
         self.parentTwo = False
         self.iteration = 0
+
+        self.achieveFlag = False
      
 
     #function to rotate the car 
@@ -197,7 +200,7 @@ class Car:
         self.y -= vertical 
     
     #function to return a no none result if a car collide with the border track
-    def collision(self, mask, x=0, y=0):
+    def collision(self, mask, x, y): #x=0, y=0
         offset = (int(self.rect.x - x), int(self.rect.y - y)) 
         col = mask.overlap(self.mask, offset) 
         return col
@@ -217,7 +220,7 @@ class Car:
 #class of the car with the initial color and position
 class PlayerCar(Car):
     IMG = CAR_GREEN
-    START_POS = (300, 660)
+    START_POS = (250,660) #(300, 660)
 
 
 #-----------------------------------------------------------------------------
@@ -282,6 +285,7 @@ game_info = GameInfo()
 aiCars = []
 numbOfCar = 100
 aliveCar = numbOfCar
+achieveTurn = False
 
 for i in range(numbOfCar):
     aiCars.append(PlayerCar(1.5,4))
@@ -342,50 +346,68 @@ while run:
             run = False
             break
 
-    
     #stop the car if there is a collision between the track border and the car
     for aicar in aiCars:
-        if aicar.collision(BORDER_MASK) == None:
-            aicar.collide = False
-            move_ai(aicar)
-        else:
-            aicar.collide = True
-            if aicar.alive == False:
-                aliveCar -=1
-                aicar.alive = True
+        if aicar.collision(FINISH_MASK, 283, 649) == None:
+            
+            if aicar.collision(BORDER_MASK, 0, 0) == None:
+                aicar.collide = False
+                move_ai(aicar)
+            else:
+                aicar.collide = True
+                if aicar.alive == False:
+                    aliveCar -=1
+                    aicar.alive = True
 
-                fitness(aicar) 
+                    fitness(aicar) 
+        else:
+            aicar.achieveFlag = True
+            achieveTurn = True
+            aliveCar = 0
 
     if aliveCar == 0:
-        fitnessList=list() 
-        for aicar in aiCars:
-            fitnessList.append(aicar.fitnessValue)
-        fitnessList.sort()
-        for aicar in aiCars:
-            #change the color of the car and turn on the bool of the parents
-            if aicar.fitnessValue == fitnessList[0]:
+
+        if not achieveTurn:
+            fitnessList=list() 
+            for aicar in aiCars:
+                fitnessList.append(aicar.fitnessValue)
+            fitnessList.sort()
+            for aicar in aiCars:
+                #change the color of the car and turn on the bool of the parents
+                if aicar.fitnessValue == fitnessList[0]:
+                    aicar.img = CAR_PURPLE
+                    aicar.parentOne = True
+                    aicar.parentTwo = False
+                elif aicar.fitnessValue == fitnessList[1]:
+                    aicar.img = CAR_PURPLE
+                    aicar.parentOne = False
+                    aicar.parentTwo = True
+                else:
+                    aicar.img = CAR_GREEN
+                    aicar.parentOne = False
+                    aicar.parentTwo = False
+            
+
+            if keys[pygame.K_RETURN]:
+                
+                crossover(aiCars, achieveTurn)  
+                mutation(aiCars)
+
+                for aicar in aiCars:
+                    aicar.reset()
+                game_info.next_stage()
+                aliveCar = numbOfCar
+            
+        else:
+            if keys[pygame.K_RETURN]:
                 aicar.img = CAR_PURPLE
-                aicar.parentOne = True
-                aicar.parentTwo = False
-            elif aicar.fitnessValue == fitnessList[1]:
-                aicar.img = CAR_PURPLE
-                aicar.parentOne = False
-                aicar.parentTwo = True
-            else:
-                aicar.img = CAR_GREEN
-                aicar.parentOne = False
-                aicar.parentTwo = False
 
-        #if keys[pygame.K_RETURN]:
+                crossover(aiCars, achieveTurn) 
 
-        crossover(aiCars)  
-        mutation(aiCars)
-
-        for aicar in aiCars:
-            aicar.reset()
-        game_info.next_stage()
-        aliveCar = numbOfCar
-        game_info.start_stage()
+                for aicar in aiCars:
+                    aicar.reset()
+                game_info.next_stage()
+                aliveCar = numbOfCar
 
     pygame.display.update()
 pygame.quit() 

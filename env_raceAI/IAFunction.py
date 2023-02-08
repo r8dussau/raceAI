@@ -7,7 +7,6 @@ import pygame
 def draw_car(win, aiCars):
     for aicar in aiCars:
         aicar.draw(win)
-        #pygame.display.update()
 
 #function to move the aiCar randomly or create a childrenList according to the decisionList of the two parents
 def move_ai(aicar):
@@ -40,28 +39,37 @@ def fitness(aicar):
 
 #create the list of the father and the mother according to the car which is parentOne or parentTwo
 #According to these two parents list, create for each children a list who each cell has the same probability to have the cell of the mother or the father
-def crossover(aiCars):#aicar
-    father, mother = list(), list()
-    for aicar in aiCars:
-        if aicar.parentOne==True:
-            father = aicar.decisionList[:len(aicar.decisionList)-5]
+def crossover(aiCars, achieveTurn):#aicar
+    if not achieveTurn:
+        father, mother = list(), list()
+        for aicar in aiCars:
+            if aicar.parentOne==True:
+                father = aicar.decisionList[:len(aicar.decisionList)-3]
+                aicar.decisionList = father
+
+            elif aicar.parentTwo==True:
+                mother = aicar.decisionList[:len(aicar.decisionList)-3]
+                aicar.decisionList = mother
+
+        for aicar in aiCars:
+            if (aicar.parentOne==False) and (aicar.parentTwo==False):
+                aicar.decisionList = list()
+                for i in range(len(father)):
+                    random = randint(1,2)
+                    if random == 1:
+                        aicar.decisionList.append(father[i])
+                    elif (random == 2) and (i<len(mother)):
+                        aicar.decisionList.append(mother[i])
+                    else:
+                        aicar.decisionList.append(father[i])
+    else:
+        father = list()
+        for aicar in aiCars:
+            if aicar.achieveFlag:
+                father = aicar.decisionList
+        for aicar in aiCars:
             aicar.decisionList = father
 
-        elif aicar.parentTwo==True:
-            mother = aicar.decisionList[:len(aicar.decisionList)-5]
-            aicar.decisionList = mother
-
-    for aicar in aiCars:
-        if (aicar.parentOne==False) and (aicar.parentTwo==False):
-            aicar.decisionList = list()
-            for i in range(len(father)):
-                random = randint(1,2)
-                if random == 1:
-                    aicar.decisionList.append(father[i])
-                elif (random == 2) and (i<len(mother)):
-                    aicar.decisionList.append(mother[i])
-                else:
-                    aicar.decisionList.append(father[i])
     
 #each cell of each list has 0.4% to see his cell randomly changed
 def mutation(aiCars):
