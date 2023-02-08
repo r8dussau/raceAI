@@ -4,8 +4,9 @@ All the usefull files are available on this git.
 
 ### Components
 All components can be found in env_raceAI folder:  
-- *main.py* contains all our python code to run the game with the Artificial Intelligent.
+- *main.py* contains all our python code to run the game.
 - *utils.py* contains some functions used in the main file. 
+- *IAFunction.py* contains all functions related to the AI (Fitness, crossover, mutation, move and display the car). 
 - *imgs* folder contains all the images who are used in this project.
 - *papers.pdf* is the file who helped me to implement the Genetic Algorithm.
 
