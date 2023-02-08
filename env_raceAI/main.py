@@ -13,12 +13,12 @@ pygame.font.init()
 #-----------------------------------------------------------------------------
 #image loading
 
-TRACK = scale_image(pygame.image.load("env_raceAI/imgs/track_1.png"),1.7)#1.7
+TRACK = scale_image(pygame.image.load("env_raceAI/imgs/track.png"),1.7)#1.7
 GRASS = scale_image(pygame.image.load("env_raceAI/imgs/grass.jpg"),500*1.7/311)
 FINISH = scale_image(pygame.image.load("env_raceAI/imgs/finish.png"),0.475)
 
 
-BORDER = scale_image(pygame.image.load("env_raceAI/imgs/border_1.png"),1.7)
+BORDER = scale_image(pygame.image.load("env_raceAI/imgs/border.png"),1.7)
 BORDER_MASK = pygame.mask.from_surface(BORDER)  #create a mask of the border track for the collision 
 
 CAR_GREEN = scale_image(pygame.image.load("env_raceAI/imgs/car_green.png"),0.04)#0.04
@@ -254,10 +254,12 @@ def move_player(plr_car,keys):
             plr_car.rotate(left=True)
         if keys[pygame.K_RIGHT]:
             plr_car.rotate(right=True)
-        #if keys[pygame.K_UP]:
-            #player_car.move_forward()
         plr_car.move_forward()
         plr_car.update()
+    pygame.display.update()
+
+def draw_player(win, plr_car):
+    plr_car.draw(win)
     pygame.display.update()
 
 #-----------------------------------------------------------------------------
@@ -298,6 +300,34 @@ while run:
 
     draw_background(WIN,imgs,game_info)
 
+    #get the key of the keyboard pressed
+    keys = pygame.key.get_pressed() 
+
+    #-------------------------------------------------------------------------
+    #If you want to display and control a Car
+
+    # #display the player_car
+    # draw_player(WIN, player_car)
+
+    # #control of the player's car
+    # if player_car.collision(BORDER_MASK) == None:
+    #     player_car.collide = False
+    #     move_player(player_car,keys)
+    # else:
+    #     player_car.collide = True
+    #     move_player(player_car,keys)
+    #     aliveCar=0
+    #     if keys[pygame.K_RETURN]:
+    #         aliveCar=1
+    #         player_car.reset()
+    #         game_info.next_stage()
+    
+        
+    # if keys[pygame.K_a]:
+    #     player_car.showLines() 
+
+    #-------------------------------------------------------------------------
+
     draw_car(WIN, aiCars)
 
     #Display text before the begining of each generation 
@@ -317,9 +347,6 @@ while run:
             run = False
             break
 
-    
-    #get the key of the keyboard pressed
-    keys = pygame.key.get_pressed() 
     
     #stop the car if there is a collision between the track border and the car
     for aicar in aiCars:
@@ -364,25 +391,5 @@ while run:
             game_info.next_stage()
             aliveCar = numbOfCar
 
-    #-------------------------------------------------------------------------
-    #If you want to display and control a Car
-
-    #display the player_car
-    #draw_car(WIN, player_car)
-
-    #control of the player's car
-    # if player_car.collision(BORDER_MASK) == None:
-    #     player_car.collide = False
-    #     move_player(player_car,keys)
-    # else:
-    #     player_car.collide = True
-    #     move_player(player_car,keys)
-    #     fitness(player_car)
-    
-        
-    # if keys[pygame.K_a]:
-    #     player_car.showLines() 
-
-    #-------------------------------------------------------------------------
 
 pygame.quit() 

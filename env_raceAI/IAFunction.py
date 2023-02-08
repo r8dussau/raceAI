@@ -29,6 +29,7 @@ def move_ai(aicar):
             aicar.rotate(right=True)
         else:
             pass
+    aicar.update()
 
 #-----------------------------------------------------------------------------
 #Genetic Algorithm function
