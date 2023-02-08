@@ -1,6 +1,6 @@
-# IntelliQ  
-IntelliQ project from Software engineering Semester 7 course in Electronical and Computer Engineering School, NTUA.  
-Back-end python API and Database model are available on this git.  
+# RaceAI
+RaceAI project from Neural Networks and Intelligent Systems Semester 9 course in Electronical and Computer Engineering School, NTUA.  
+Python files are available on this git. 
 
 ### Components
 All components can be found in env_intelliq folder:  
@@ -9,20 +9,21 @@ All components can be found in env_intelliq folder:
 - *intelliq_api.py* contains all our python endpoints functions.  
 - *QQ000.json* is a questionnaire file who can be used to test the questionnaire upload endpoint.  
 - *setup_database.txt* containes all the code you should put in your database QUERY to setup our database model. 
+- *main.py* contain all 
 
-### Authors
+### Author
 - Raphaël Dussauze
-- Jules Morin
 
 ## Installation
 
 ### Python requirements 
 
-The python API needs the following librairy to run:
+The python files need the following librairy to run:
 
-- flask
-- flask-wtf
-- mysql-connector-python
+- pygame
+- math
+- time
+- random.randint
 
 You can use the package manager [pip](https://pip.pypa.io/en/stable/) to install these librairy in a python environnement:
 
